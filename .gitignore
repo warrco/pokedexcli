@@ -1,0 +1,13 @@
+# Binaries
+*.exe
+*.o
+*.a
+
+# Test binary
+*.test
+pokedexcli
+
+# Temporary build files and directories
+_obj
+_test
+*.out
