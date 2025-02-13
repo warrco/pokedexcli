@@ -7,29 +7,43 @@ import (
 	"net/http"
 )
 
-func FetchLocations(url string, config *Locations) error {
-	if url == "" {
-		url = baseURL + "/location-area"
+func (c *Client) FetchLocations(pageURL *string) (AreaLocations, error) {
+	url := baseURL + "/location-area"
+	if pageURL != nil {
+		url = *pageURL
 	}
 
-	res, err := http.Get(url)
+	if data, ok := c.cache.Get(url); ok {
+		areaLocations := AreaLocations{}
+		err := json.Unmarshal(data, &areaLocations)
+		if err != nil {
+			return AreaLocations{}, fmt.Errorf("error unmarshaling JSON: %w", err)
+		}
+		return areaLocations, nil
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return fmt.Errorf("error making GET request: %w", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode > 299 {
-		return fmt.Errorf("bad status: %d", res.StatusCode)
+		return AreaLocations{}, fmt.Errorf("error making GET request: %w", err)
 	}
 
-	body, err := io.ReadAll(res.Body)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
+		return AreaLocations{}, fmt.Errorf("no data returned: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return AreaLocations{}, fmt.Errorf("error reading response body: %w", err)
 	}
 
-	err = json.Unmarshal(body, config)
+	areaLocations := AreaLocations{}
+	err = json.Unmarshal(body, &areaLocations)
 	if err != nil {
-		return fmt.Errorf("error unmarshaling JSON: %w", err)
+		return AreaLocations{}, fmt.Errorf("error unmarshaling JSON: %w", err)
 	}
-	return nil
+
+	c.cache.Add(url, body)
+	return areaLocations, nil
 }

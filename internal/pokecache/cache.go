@@ -7,7 +7,7 @@ import (
 
 type Cache struct {
 	data     map[string]cacheEntry
-	mutex    sync.RWMutex
+	mutex    *sync.Mutex
 	interval time.Duration
 }
 
@@ -17,10 +17,11 @@ type cacheEntry struct {
 }
 
 // Create a new cache and set a time duration
-func NewCache(interval time.Duration) *Cache {
+func NewCache(interval time.Duration) Cache {
 
-	cache := &Cache{
+	cache := Cache{
 		data:     make(map[string]cacheEntry),
+		mutex:    &sync.Mutex{},
 		interval: interval,
 	}
 
@@ -44,8 +45,8 @@ func (c *Cache) Add(key string, val []byte) {
 
 // Get method to read data from the cache
 func (c *Cache) Get(key string) ([]byte, bool) {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	value, ok := c.data[key]
 	return value.val, ok

@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/warrco/pokedexcli/internal/pokeapi"
 )
 
-func commandHelp(_ *pokeapi.Locations) error {
+func commandHelp(cfg *config) error {
 
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
