@@ -6,7 +6,7 @@ import (
 	"github.com/warrco/pokedexcli/internal/pokeapi"
 )
 
-func commandHelp(_ *pokeapi.Config) error {
+func commandHelp(_ *pokeapi.Locations) error {
 
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")

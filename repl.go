@@ -5,13 +5,25 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/warrco/pokedexcli/internal/pokeapi"
+	"github.com/warrco/pokedexcli/internal/pokecache"
 )
 
+var cache *pokecache.Cache
+
 func startRepl() {
+	cache = pokecache.NewCache(5 * time.Second)
 	scanner := bufio.NewScanner(os.Stdin)
-	var config pokeapi.Config
+	var config pokeapi.Locations
+
+	err := pokeapi.FetchLocations("", &config)
+	if err != nil {
+		fmt.Println("error initializing locations", err)
+		return
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -43,7 +55,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(*pokeapi.Locations) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -61,12 +73,12 @@ func getCommands() map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "Displays map locations",
-			callback:    pokeapi.HandleMapCommand,
+			callback:    HandleMapCommand,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Displays previous map locations",
-			callback:    pokeapi.HandleMapBackCommand,
+			callback:    HandleMapBackCommand,
 		},
 	}
 }

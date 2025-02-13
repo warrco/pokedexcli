@@ -1,6 +1,10 @@
 package pokeapi
 
-type Config struct {
+const (
+	baseURL = "https://pokeapi.co/api/v2"
+)
+
+type Locations struct {
 	Count    int    `json:"count"`
 	Next     string `json:"next"`
 	Previous string `json:"previous"`
