@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandMapf(cfg *config) error {
+func commandMapf(cfg *config, args ...string) error {
 	areaLocations, err := cfg.pokeapiClient.FetchLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return fmt.Errorf("failed to fetch locations: %w", err)
@@ -19,7 +19,7 @@ func commandMapf(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args ...string) error {
 	if cfg.prevLocationsURL == nil {
 		fmt.Println("you are on the first page")
 		return nil

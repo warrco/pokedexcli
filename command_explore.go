@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-func commandExplore(cfg *config) error {
-	if len(cfg.parameters) == 0 {
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) != 1 {
 		return fmt.Errorf("please provide a valid location")
 	}
-	locationName := cfg.parameters[0]
+	locationName := args[0]
 
 	pokemonInfo, err := cfg.pokeapiClient.FetchLocationInfo(locationName)
 	if err != nil {
